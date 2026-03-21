@@ -33,6 +33,7 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
+/** Applies the app theme and optionally adopts Android 12+ dynamic system colors. */
 @Composable
 fun PitchSenseTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),

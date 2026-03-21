@@ -6,7 +6,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-// Set of Material typography styles to start with
+// Material3 typography overrides. Only bodyLarge is explicitly set; all other roles
+// (titleLarge, labelSmall, etc.) inherit Material3 defaults. Extend here if custom
+// typefaces or additional size overrides are needed.
 val Typography = Typography(
     bodyLarge = TextStyle(
         fontFamily = FontFamily.Default,

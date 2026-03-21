@@ -14,35 +14,44 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 /**
- * The primary branding element for each screen.
- * - Uses 'statusBarsPadding' to ensure the background color extends behind the
- * system clock and notification icons.
- * - Centralizes the app's signature navy blue color (0xFF233B90).
+ * Amber banner shown below the header when the app is serving local demo data
+ * instead of live API results. Collapses to nothing when online.
  */
+@Composable
+fun OfflineBanner() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFFFFF3CD))
+            .padding(horizontal = 24.dp, vertical = 8.dp),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        Text(
+            text = "Offline — showing demo data",
+            color = Color(0xFF856404),
+            style = MaterialTheme.typography.labelMedium
+        )
+    }
+}
+
+/** Top app header used across screens for consistent branding/title treatment. */
 @Composable
 fun HeaderBar(title: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color(0xFF233B90))
-            .statusBarsPadding()
-            .padding(16.dp)
+            .padding(24.dp)
     ) {
         Text(text = title, color = Color.White, style = MaterialTheme.typography.titleLarge)
     }
 }
 
-/**
- * A specialized card for displaying individual baseball metrics (e.g., BA, SLG).
- * - @param isPrimary: Determines the visual hierarchy. Primary cards use a soft
- * blue background to draw the eye to the most important data points.
- * - @param modifier: Allows calling screens to pass layout constraints like
- * 'weight' or 'padding'.
- */
+/** Metric card used for compact stat display; highlights primary stats visually. */
 @Composable
 fun StatCard(title: String, value: String, isPrimary: Boolean, modifier: Modifier = Modifier) {
     Card(
-        modifier = modifier.height(80.dp),
+        modifier = modifier.height(108.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isPrimary) Color(0xFFF0F6FF) else Color.White
         ),
@@ -53,59 +62,49 @@ fun StatCard(title: String, value: String, isPrimary: Boolean, modifier: Modifie
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Displays the label (e.g., "K%") in a subtle gray
-            Text(text = title, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
-            Spacer(modifier = Modifier.height(4.dp))
-            // Displays the actual numerical value in a prominent font
-            Text(text = value, style = MaterialTheme.typography.titleLarge)
+            // Label (for example "K%" or "OBP").
+            Text(text = title, style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+            Spacer(modifier = Modifier.height(6.dp))
+            // Emphasized metric value.
+            Text(text = value, style = MaterialTheme.typography.headlineSmall)
         }
     }
 }
 
-/**
- * A custom pill-shaped toggle button for switching between different metrics.
- * - Does not hold its own state; instead, it reports clicks to the parent screen
- * via 'onClick'.
- * - Changes colors dynamically based on the 'isSelected' boolean to provide
- * immediate visual feedback.
- */
+/** Stateless pill toggle used for metric/tab-style selection controls. */
 @Composable
 fun ToggleButton(text: String, isSelected: Boolean, onClick: () -> Unit) {
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(20.dp))
             .background(if (isSelected) Color(0xFF233B90) else Color(0xFFF0F2F5))
-            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .padding(horizontal = 24.dp, vertical = 12.dp)
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = text,
             color = if (isSelected) Color.White else Color.Gray,
-            style = MaterialTheme.typography.labelMedium
+            style = MaterialTheme.typography.labelLarge
         )
     }
 }
 
-/**
- * A key-value pair used to explain the HeatMap colors.
- * - Maps a specific Color box to a descriptive label (e.g., "Elite").
- * - Used primarily on the HeatMap screen to help users interpret performance zones.
- */
+/** Single heat-map legend row mapping a color swatch to its label. */
 @Composable
 fun LegendItem(color: Color, label: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(vertical = 4.dp)
+        modifier = Modifier.padding(vertical = 10.dp)
     ) {
-        // Representative color swatch
+        // Color swatch for this performance bucket.
         Box(
             modifier = Modifier
-                .size(24.dp)
-                .background(color, RoundedCornerShape(4.dp))
+                .size(48.dp)
+                .background(color, RoundedCornerShape(8.dp))
         )
-        Spacer(modifier = Modifier.width(12.dp))
-        // Explanatory text
-        Text(text = label, style = MaterialTheme.typography.bodySmall)
+        Spacer(modifier = Modifier.width(20.dp))
+        // Human-readable bucket label.
+        Text(text = label, style = MaterialTheme.typography.titleSmall)
     }
 }
