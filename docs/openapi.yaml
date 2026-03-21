@@ -35,10 +35,11 @@ paths:
             type: string
         - in: query
           name: season
-          required: true
+          required: false
           schema:
             type: integer
             minimum: 1900
+            default: 2025
       responses:
         '200':
           description: Overview stats
@@ -73,10 +74,11 @@ paths:
             type: string
         - in: query
           name: season
-          required: true
+          required: false
           schema:
             type: integer
             minimum: 1900
+            default: 2025
       responses:
         '200':
           description: Advanced metrics
@@ -111,10 +113,11 @@ paths:
             $ref: '#/components/schemas/HeatMetric'
         - in: query
           name: season
-          required: true
+          required: false
           schema:
             type: integer
             minimum: 1900
+            default: 2025
       responses:
         '200':
           description: Heatmap payload
@@ -210,6 +213,9 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+        '502':
+          $ref: '#/components/responses/BadGateway'
+
 components:
   responses:
     BadRequest:
@@ -230,6 +236,12 @@ components:
           examples:
             default:
               $ref: '#/components/examples/NotFoundExample'
+    BadGateway:
+      description: Model service unavailable or timed out
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
 
 
   examples:
@@ -515,6 +527,7 @@ components:
           type: integer
           minimum: 1
           maximum: 9
+          description: "MVP scope: extra innings not supported."
         balls:
           type: integer
           minimum: 0
@@ -579,6 +592,19 @@ components:
       properties:
         appliedScenario:
           type: string
+          description: >
+            Scenario label derived from the game situation. Evaluated in priority order:
+            strikes == 2 → "Two-Strike Putaway";
+            balls == 3 → "Hitter Count Damage Control";
+            high leverage (inning >= 7 with >=1 runner, or outs == 2 with >=2 runners) → "High Leverage";
+            runnerOnThird and outs < 2 → "Runner on 3rd, <2 Outs";
+            otherwise → "Neutral Situation".
+          enum:
+            - Two-Strike Putaway
+            - Hitter Count Damage Control
+            - High Leverage
+            - Runner on 3rd, <2 Outs
+            - Neutral Situation
         recommendations:
           type: array
           items:

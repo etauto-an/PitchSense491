@@ -39,8 +39,8 @@ Error codes in use:
 
 ## 1) Overview Cards
 
-### `GET /overview/stats?batterId=...&pitcherId=...&season=2026`
-Returns both overview columns in one call. `pitcherId` is optional; omitting it returns the `general` column populated and `pitcherSpecific` as an empty array `[]`.
+### `GET /overview/stats?batterId=...&pitcherId=...&season=2025`
+Returns both overview columns in one call. `pitcherId` is optional; omitting it returns the `general` column populated and `pitcherSpecific` as an empty array `[]`. `season` is optional and defaults to `2025`.
 
 Response `404`: unknown `batterId` or `pitcherId`.
 
@@ -66,8 +66,8 @@ Response `200`:
 
 ## 2) Advanced Stats
 
-### `GET /advanced/stats?batterId=...&pitcherId=...&season=2026`
-Should return only directly available Statcast-style metrics currently shown. `pitcherId` is optional.
+### `GET /advanced/stats?batterId=...&pitcherId=...&season=2025`
+Should return only directly available Statcast-style metrics currently shown. `pitcherId` is optional. `season` is optional and defaults to `2025`.
 
 > **MVP scope note:** Situational stats (`RISP BA`, `2-Strike BA`, `Ahead in Count`, `High Leverage OPS`) are not included in this endpoint — they are hardcoded placeholders on the client for the MVP. Do not implement them on the backend.
 
@@ -102,8 +102,8 @@ Response `200`:
 
 ## 3) Heat Map
 
-### `GET /heatmap?batterId=...&metric=BA&season=2026`
-Supported `metric`: `BA`, `SLG`, `OPS`.
+### `GET /heatmap?batterId=...&metric=BA&season=2025`
+Supported `metric`: `BA`, `SLG`, `OPS`. `season` is optional and defaults to `2025`.
 
 Response `404`: unknown `batterId`.
 
@@ -167,6 +167,18 @@ Response `200`:
       "pitchType": "Slider",
       "description": "Back-foot, lower third — chase for strike three",
       "effectivenessPct": 84
+    },
+    {
+      "step": 2,
+      "pitchType": "Splitter",
+      "description": "Bottom edge — late drop below zone",
+      "effectivenessPct": 80
+    },
+    {
+      "step": 3,
+      "pitchType": "4-Seam Fastball",
+      "description": "Top rail, glove side — finish above bat path",
+      "effectivenessPct": 76
     }
   ]
 }
@@ -244,13 +256,10 @@ Error mapping guidance:
 
 ## Validation Rules
 - `pitchesToPredict`: `1..3`
-- `inning`: `1..9` (or broader if extras supported)
+- `inning`: `1..9` (MVP scope; extras not supported)
 - `balls`: `0..3`
 - `strikes`: `0..2`
 - `outs`: `0..2`
 - `metric`: `BA | SLG | OPS`
 - `pitcherId` optional in overview endpoints, required for pitch-sequence endpoint
 
-## Open Questions for Backend Alignment
-1. Should advanced endpoint support date windows and min sample filters?
-2. Do we need endpoint-level caching hints (`Cache-Control`, ETag)?
