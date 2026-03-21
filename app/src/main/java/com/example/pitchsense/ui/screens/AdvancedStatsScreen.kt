@@ -9,8 +9,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview. Preview
 import androidx.compose.ui.unit.dp
 import com.example.pitchsense.ui.components.ScreenScaffold
+import com.example.pitchsense.ui.theme.Dimensions
 
 /**
  * Screen designed for in-depth statistical analysis of a batter.
@@ -18,6 +20,12 @@ import com.example.pitchsense.ui.components.ScreenScaffold
  * - Implements 'verticalScroll' to prevent content clipping on smaller screens or
  * when the data list grows.
  */
+
+@Preview(showBackground = true)
+@Composable
+fun AdvancedStatsScreenPreview() {
+    AdvancedStatsScreen(onBackClick = {})
+}
 @Composable
 fun AdvancedStatsScreen(onBackClick: () -> Unit) {
     ScreenScaffold(title = "Advanced Batter Statistics", onBackClick = onBackClick) {
@@ -31,9 +39,9 @@ fun AdvancedStatsScreen(onBackClick: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F6FF))
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Batter Statistics - Mike Trout", style = MaterialTheme.typography.titleMedium)
-                    Spacer(modifier = Modifier.height(16.dp))
+                Column(modifier = Modifier.padding(Dimensions.cardPadding)) {
+                    Text("Batter Statistics - Mike Trout", fontSize = Dimensions.titleFontSize)
+                    Spacer(modifier = Modifier.height(Dimensions.spacingMedium))
 
                     // First row of summary stats.
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
@@ -42,7 +50,7 @@ fun AdvancedStatsScreen(onBackClick: () -> Unit) {
                         AdvancedStatItem("Hard Hit%", "45.2%")
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(Dimensions.spacingMedium))
 
                     // Second row of summary stats.
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
@@ -53,23 +61,23 @@ fun AdvancedStatsScreen(onBackClick: () -> Unit) {
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(Dimensions.spacingLarge))
 
             // Detailed Breakdown Section: Performance categorized by pitch type.
-            Text("Performance vs Pitch Type", style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(8.dp))
+            Text("Performance vs Pitch Type", fontSize = Dimensions.titleFontSize)
+            Spacer(modifier = Modifier.height(Dimensions.spacingSmall))
 
             // Custom Table Header: Uses 'Modifier.weight' to align with data rows below.
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
+                    .padding(vertical = Dimensions.spacingSmall),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Pitch", modifier = Modifier.weight(2f), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
-                Text("BA", modifier = Modifier.weight(1f), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
-                Text("SLG", modifier = Modifier.weight(1f), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
-                Text("Whiff", modifier = Modifier.weight(1f), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
+                Text("Pitch", modifier = Modifier.weight(2f), fontWeight = FontWeight.Bold, fontSize = Dimensions.labelFontSize)
+                Text("BA", modifier = Modifier.weight(1f), fontWeight = FontWeight.Bold, fontSize = Dimensions.labelFontSize)
+                Text("SLG", modifier = Modifier.weight(1f), fontWeight = FontWeight.Bold, fontSize = Dimensions.labelFontSize)
+                Text("Whiff", modifier = Modifier.weight(1f), fontWeight = FontWeight.Bold, fontSize = Dimensions.labelFontSize)
             }
             HorizontalDivider()
 
@@ -89,8 +97,8 @@ fun AdvancedStatsScreen(onBackClick: () -> Unit) {
 @Composable
 fun AdvancedStatItem(label: String, value: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(label, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
-        Text(value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Text(label, fontSize = Dimensions.labelFontSize, color = Color.Gray)
+        Text(value, fontSize = Dimensions.titleFontSize, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -104,14 +112,14 @@ fun PitchTypeRow(name: String, ba: String, slg: String, whiff: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp),
+            .padding(vertical = Dimensions.spacingSmall),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         // Pitch name gets more space (weight 2) to accommodate longer text.
-        Text(name, modifier = Modifier.weight(2f), style = MaterialTheme.typography.bodyMedium)
-        Text(ba, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
-        Text(slg, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
-        Text(whiff, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+        Text(name, modifier = Modifier.weight(2f), fontSize = Dimensions.bodyFontSize)
+        Text(ba, modifier = Modifier.weight(1f), fontSize = Dimensions.bodyFontSize)
+        Text(slg, modifier = Modifier.weight(1f), fontSize = Dimensions.bodyFontSize)
+        Text(whiff, modifier = Modifier.weight(1f), fontSize = Dimensions.bodyFontSize)
     }
     HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
 }

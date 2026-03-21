@@ -12,6 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.pitchsense.ui.theme.Dimensions
+import androidx.compose.ui.text.TextStyle
 
 /**
  * The primary branding element for each screen.
@@ -26,9 +28,9 @@ fun HeaderBar(title: String) {
             .fillMaxWidth()
             .background(Color(0xFF233B90))
             .statusBarsPadding()
-            .padding(16.dp)
+            .padding(20.dp)
     ) {
-        Text(text = title, color = Color.White, style = MaterialTheme.typography.titleLarge)
+        Text(text = title, color = Color.White, fontSize = Dimensions.titleFontSize)
     }
 }
 
@@ -54,10 +56,10 @@ fun StatCard(title: String, value: String, isPrimary: Boolean, modifier: Modifie
             verticalArrangement = Arrangement.Center
         ) {
             // Displays the label (e.g., "K%") in a subtle gray
-            Text(text = title, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+            Text(text = title, fontSize = Dimensions.labelFontSize, color = Color.Gray)
             Spacer(modifier = Modifier.height(4.dp))
             // Displays the actual numerical value in a prominent font
-            Text(text = value, style = MaterialTheme.typography.titleLarge)
+            Text(text = value, fontSize = Dimensions.bodyFontSize)
         }
     }
 }
@@ -82,7 +84,7 @@ fun ToggleButton(text: String, isSelected: Boolean, onClick: () -> Unit) {
         Text(
             text = text,
             color = if (isSelected) Color.White else Color.Gray,
-            style = MaterialTheme.typography.labelMedium
+            fontSize = Dimensions.bodyFontSize
         )
     }
 }
@@ -106,6 +108,6 @@ fun LegendItem(color: Color, label: String) {
         )
         Spacer(modifier = Modifier.width(12.dp))
         // Explanatory text
-        Text(text = label, style = MaterialTheme.typography.bodySmall)
+        Text(text = label, fontSize = Dimensions.bodyFontSize)
     }
 }

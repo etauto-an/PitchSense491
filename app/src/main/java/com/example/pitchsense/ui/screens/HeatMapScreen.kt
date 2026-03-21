@@ -14,17 +14,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview. Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.pitchsense.ui.components.LegendItem
 import com.example.pitchsense.ui.components.ScreenScaffold
 import com.example.pitchsense.ui.components.ToggleButton
+import com.example.pitchsense.ui.theme.Dimensions
 
 /**
  * High-level screen that manages the state for batter performance visualization.
  * - Uses 'remember' to preserve the selected metric (BA, SLG, OPS) during recomposition.
  * - Wraps the content in 'ScreenScaffold' to provide a consistent back-navigation experience.
  */
+@Preview(showBackground = true)
+@Composable
+fun HeatMapScreenPreview() {
+    HeatMapScreen(onBackClick = {})
+}
 @Composable
 fun HeatMapScreen(onBackClick: () -> Unit) {
     // Current statistical category being viewed. Changing this updates the grid data.
@@ -35,41 +42,41 @@ fun HeatMapScreen(onBackClick: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.White, RoundedCornerShape(8.dp))
-                .padding(16.dp)
+                .padding(Dimensions.spacingMedium)
                 // Allows users to scroll through the legend and analysis on smaller screens.
                 .verticalScroll(rememberScrollState())
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(Dimensions.spacingSmall)
             ) {
                 Text(
                     text = "Batter Performance Heat Map - Mike Trout",
-                    style = MaterialTheme.typography.titleMedium,
+                    fontSize = Dimensions.labelFontSize,
                     fontWeight = FontWeight.Bold
                 )
 
                 // Toggle buttons report back selection changes, updating 'selectedMetric'.
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.spacingSmall)) {
                     ToggleButton("BA", selectedMetric == "BA") { selectedMetric = "BA" }
                     ToggleButton("SLG", selectedMetric == "SLG") { selectedMetric = "SLG" }
                     ToggleButton("OPS", selectedMetric == "OPS") { selectedMetric = "OPS" }
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(Dimensions.spacingLarge))
 
-            Row(
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(24.dp)
+                verticalArrangement = Arrangement.spacedBy(Dimensions.spacingLarge)
             ) {
                 // Left Column: The visual representation of the strike zone.
                 Column(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     HeatMapGrid(metric = selectedMetric)
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(Dimensions.spacingSmall))
                     Text(
                         text = "Strike Zone View (Catcher's Perspective)",
                         style = MaterialTheme.typography.labelSmall,
@@ -78,9 +85,9 @@ fun HeatMapScreen(onBackClick: () -> Unit) {
                 }
 
                 // Right Column: Key/Legend and Strategic Analysis.
-                Column(modifier = Modifier.weight(1f)) {
+                Column(modifier = Modifier.fillMaxWidth()) {
                     Text(text = "Performance Legend", style = MaterialTheme.typography.titleSmall)
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(Dimensions.spacingMedium))
 
                     // Reusable LegendItems explain the color values used in the grid.
                     LegendItem(color = Color(0xFF00897B), label = ".350+ (Elite)")
@@ -88,9 +95,9 @@ fun HeatMapScreen(onBackClick: () -> Unit) {
                     LegendItem(color = Color(0xFFFFCA28), label = ".240-.269 (Below Avg)")
                     LegendItem(color = Color(0xFFFFB74D), label = "<.240 (Weak)")
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(Dimensions.spacingLarge))
                     HorizontalDivider(color = Color(0xFFE0E0E0))
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(Dimensions.spacingMedium))
 
                     Text(text = "Analysis", style = MaterialTheme.typography.titleSmall)
                     Text(
@@ -139,7 +146,7 @@ fun HeatMapGrid(metric: String) {
         modifier = Modifier
             .aspectRatio(1f) // Maintains a perfect square regardless of screen width.
             .background(Color(0xFFF8F9FA), RoundedCornerShape(8.dp))
-            .padding(8.dp)
+            .padding(Dimensions.spacingSmall)
     ) {
         gridData.forEachIndexed { rowIndex, row ->
             Row(modifier = Modifier.weight(1f)) {
@@ -154,7 +161,7 @@ fun HeatMapGrid(metric: String) {
                             .border(width = if (isStrikeZone) 1.dp else 0.dp, color = Color.Black),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(text = cell.first, fontSize = 10.sp)
+                        Text(text = cell.first, fontSize = Dimensions.gridTextSize)
                     }
                 }
             }

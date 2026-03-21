@@ -3,10 +3,18 @@ package com.example.pitchsense.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.tooling.preview. Preview
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.pitchsense.ui.components.HeaderBar
 import com.example.pitchsense.ui.components.StatCard
+import com.example.pitchsense.ui.theme.Dimensions
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.Alignment
+
+
 
 /**
  * The main analytical dashboard for PitchSense.
@@ -14,6 +22,15 @@ import com.example.pitchsense.ui.components.StatCard
  * statistical summaries.
  * - It uses a 'TabRow' to toggle between global batter data and matchup-specific data.
  */
+@Preview(showBackground = true)
+@Composable
+fun OverviewScreenPreview() {
+    OverviewScreen(
+        onNavigateToAdvancedStats = {},
+        onNavigateToHeatMap = {},
+        onNavigateToPitchSequence = {}
+    )
+}
 @Composable
 fun OverviewScreen(
     onNavigateToAdvancedStats: () -> Unit,
@@ -28,36 +45,39 @@ fun OverviewScreen(
         // Shared branding component from the components package.
         HeaderBar(title = "PitchSense: Analyze Batter")
 
-        Column(modifier = Modifier.padding(16.dp)) {
-            Spacer(modifier = Modifier.height(16.dp))
+        Column(modifier = Modifier.padding(Dimensions.spacingMedium)) {
+            Spacer(modifier = Modifier.height(Dimensions.spacingMedium))
+            //screen for the game score
+            GameScoreScreen()
+            Spacer(modifier = Modifier.height(Dimensions.spacingMedium))
 
             // Date Range Selection: Uses 'weight(1f)' to evenly split the horizontal space.
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(value = "", onValueChange = {}, label = { Text("Start Date") }, modifier = Modifier.weight(1f))
-                OutlinedTextField(value = "", onValueChange = {}, label = { Text("End Date") }, modifier = Modifier.weight(1f))
+            Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.spacingSmall)) {
+                OutlinedTextField(value = "", onValueChange = {}, label = { Text("Start Date", fontSize = Dimensions.labelFontSize) }, placeholder = { Text("mm/dd/yyyy", fontSize = Dimensions.labelFontSize)}, modifier = Modifier.weight(1f), textStyle = TextStyle(fontSize = Dimensions.bodyFontSize))
+                OutlinedTextField(value = "", onValueChange = {}, label = { Text("End Date", fontSize = Dimensions.labelFontSize) }, placeholder = { Text("mm/dd/yyyy", fontSize = Dimensions.labelFontSize)}, modifier = Modifier.weight(1f),  textStyle = TextStyle(fontSize = Dimensions.bodyFontSize))
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Dimensions.spacingSmall))
 
             // Primary filter inputs for the scouting report.
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(value = "Mike Trout", onValueChange = {}, label = { Text("Choose Batter (Required)") }, modifier = Modifier.weight(1f))
-                OutlinedTextField(value = "Liam Hendriks", onValueChange = {}, label = { Text("Choose Pitcher (Optional)") }, modifier = Modifier.weight(1f))
+            Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.spacingSmall)) {
+                OutlinedTextField(value = "Mike Trout", onValueChange = {}, label = { Text("Choose Batter (Required)", fontSize = Dimensions.labelFontSize) }, modifier = Modifier.weight(1f), textStyle = TextStyle(fontSize = Dimensions.bodyFontSize))
+                OutlinedTextField(value = "Liam Hendriks", onValueChange = {}, label = { Text("Choose Pitcher (Optional)", fontSize = Dimensions.labelFontSize) }, modifier = Modifier.weight(1f), textStyle = TextStyle(fontSize = Dimensions.bodyFontSize))
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Dimensions.spacingMedium))
 
             // Navigational Tabs: Switches the context of the statistical display below.
             TabRow(selectedTabIndex = selectedTabIndex) {
                 Tab(
                     selected = selectedTabIndex == 0,
                     onClick = { selectedTabIndex = 0 },
-                    text = { Text("General") }
+                    text = { Text("General", fontSize = Dimensions.labelFontSize) }
                 )
                 Tab(
                     selected = selectedTabIndex == 1,
                     onClick = { selectedTabIndex = 1 },
-                    text = { Text("Pitcher Specific") }
+                    text = { Text("Pitcher Specific", fontSize = Dimensions.labelFontSize) }
                 )
             }
 
@@ -78,16 +98,16 @@ fun OverviewScreen(
 
             // High-level navigation actions leading to detailed reports.
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                Button(onClick = onNavigateToAdvancedStats, modifier = Modifier.weight(1f)) {
-                    Text("Advanced Stats")
+                Button(onClick = onNavigateToAdvancedStats, modifier = Modifier.weight(1f).height(Dimensions.buttonHeight)) {
+                    Text("Advanced Stats", fontSize = Dimensions.buttonFontSize)
                 }
-                Button(onClick = onNavigateToHeatMap, modifier = Modifier.weight(1f)) {
-                    Text("Batter Heat Maps")
+                Button(onClick = onNavigateToHeatMap, modifier = Modifier.weight(1f).height(Dimensions.buttonHeight)) {
+                    Text("Batter Heat Maps", fontSize = Dimensions.buttonFontSize)
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = onNavigateToPitchSequence, modifier = Modifier.fillMaxWidth()) {
-                Text("Recommended Pitch Sequence")
+            Button(onClick = onNavigateToPitchSequence, modifier = Modifier.fillMaxWidth().height(Dimensions.buttonHeight)) {
+                Text("Recommended Pitch Sequence", fontSize = Dimensions.buttonFontSize)
             }
         }
     }
@@ -100,7 +120,7 @@ fun OverviewScreen(
 @Composable
 fun GeneralStatsContent() {
     Column {
-        Text("Batter Overview", style = MaterialTheme.typography.titleMedium)
+        Text("Batter Overview",  fontSize = Dimensions.titleFontSize)
         Spacer(modifier = Modifier.height(8.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             // isPrimary = true uses a distinct background for high-priority metrics.
@@ -123,7 +143,7 @@ fun GeneralStatsContent() {
 @Composable
 fun PitcherSpecificStatsContent() {
     Column {
-        Text("Batter Overview vs. Liam Hendriks", style = MaterialTheme.typography.titleMedium)
+        Text("Batter Overview vs. Liam Hendriks", fontSize = Dimensions.titleFontSize)
         Spacer(modifier = Modifier.height(8.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             StatCard(title = "BA (Batting Avg)", value = ".318", isPrimary = true, modifier = Modifier.weight(1f))
@@ -134,6 +154,66 @@ fun PitcherSpecificStatsContent() {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             StatCard(title = "OBP", value = ".385", isPrimary = false, modifier = Modifier.weight(1f))
             StatCard(title = "HRs", value = "5", isPrimary = false, modifier = Modifier.weight(1f))
+        }
+    }
+}
+// Screen with the teams scores.
+@Composable
+fun GameScoreScreen() {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF233B90))
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(Dimensions.spacingSmall),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Home", fontSize = Dimensions.bodyFontSize, fontWeight = FontWeight.Bold, color = Color.White)
+                Text("12:26", fontSize = Dimensions.titleFontSize, fontWeight = FontWeight.Bold, color = Color.Yellow)
+                Text("Guest", fontSize = Dimensions.bodyFontSize, fontWeight = FontWeight.Bold, color = Color.White)
+            }
+
+            Spacer(modifier = Modifier.height(Dimensions.spacingSmall))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("02", fontSize = Dimensions.titleFontSize, fontWeight = FontWeight.Bold, color = Color.Red)
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("INNING", fontSize = Dimensions.labelFontSize, color = Color.White)
+                    Text("6", fontSize = Dimensions.titleFontSize, fontWeight = FontWeight.Bold, color = Color.White)
+                }
+                Text("06", fontSize = Dimensions.titleFontSize, fontWeight = FontWeight.Bold, color = Color.Red)
+            }
+
+            Spacer(modifier = Modifier.height(Dimensions.spacingSmall))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("BALL", fontSize = Dimensions.labelFontSize, color = Color.White)
+                    Row { Text("X", color = Color.Red); Text("X", color = Color.Red) }
+                }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("STRIKE", fontSize = Dimensions.labelFontSize, color = Color.White)
+                    Row { Text("X", color = Color.Red); Text("X", color = Color.Red) }
+                }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("OUT", fontSize = Dimensions.labelFontSize, color = Color.White)
+                    Text("X", color = Color.Red)
+                }
+            }
         }
     }
 }

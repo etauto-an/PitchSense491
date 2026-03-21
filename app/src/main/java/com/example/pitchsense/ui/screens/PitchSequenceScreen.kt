@@ -11,8 +11,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview. Preview
 import androidx.compose.ui.unit.dp
 import com.example.pitchsense.ui.components.ScreenScaffold
+import com.example.pitchsense.ui.theme.Dimensions
+import androidx.compose.ui.text.TextStyle
+
+@Preview(showBackground = true)
+@Composable
+fun PitchSequenceScreenPreview() {
+    PitchSequenceScreen(onBackClick = {})
+}
 
 /**
  * Screen providing a step-by-step pitching strategy.
@@ -28,19 +37,19 @@ fun PitchSequenceScreen(onBackClick: () -> Unit) {
                 .verticalScroll(rememberScrollState())
         ) {
             // Optional Input Section: Allows users to refine the prediction parameters.
-            Text("Game Situation (Optional)", style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(8.dp))
+            Text("Game Situation (Optional)", fontSize = Dimensions.titleFontSize)
+            Spacer(modifier = Modifier.height(Dimensions.spacingSmall))
 
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(value = "3", onValueChange = {}, label = { Text("Pitches to Predict") }, modifier = Modifier.weight(1f))
-                OutlinedTextField(value = "", onValueChange = {}, label = { Text("Inning") }, modifier = Modifier.weight(1f))
+            Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.spacingSmall)) {
+                OutlinedTextField(value = "3", onValueChange = {}, label = { Text("Pitches to Predict", fontSize = Dimensions.labelFontSize) }, modifier = Modifier.weight(1f), textStyle = TextStyle(fontSize = Dimensions.bodyFontSize))
+                OutlinedTextField(value = "", onValueChange = {}, label = { Text("Inning", fontSize = Dimensions.labelFontSize) }, modifier = Modifier.weight(1f), textStyle = TextStyle(fontSize = Dimensions.bodyFontSize))
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Dimensions.spacingMedium))
 
             // Results Section: Displays the actual suggested pitches.
-            Text("Recommended Pitch Sequence (3 Pitches)", style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(12.dp))
+            Text("Recommended Pitch Sequence (3 Pitches)", fontSize = Dimensions.labelFontSize)
+            Spacer(modifier = Modifier.height(Dimensions.spacingSmall))
 
             /**
              * Procedural List: We manually call 'SequenceStep' here.
@@ -51,7 +60,7 @@ fun PitchSequenceScreen(onBackClick: () -> Unit) {
             SequenceStep(2, "Slider", "Down and in, 88.1 mph - Exploit low BA zone", "78%")
             SequenceStep(3, "Changeup", "Down and away, 84.5 mph - Induce weak contact", "75%")
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Dimensions.spacingMedium))
 
             // Insight Box: Uses a light yellow background to highlight 'Expert Analysis'
             // separate from the raw 'Data' in the list above.
@@ -59,7 +68,7 @@ fun PitchSequenceScreen(onBackClick: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color(0xFFFFFDE7), RoundedCornerShape(8.dp))
-                    .padding(16.dp)
+                    .padding(Dimensions.cardPadding)
             ) {
                 Text(
                     "Analysis: Based on Mike Trout's weaknesses and Liam Hendriks' arsenal strengths.",
@@ -82,29 +91,29 @@ fun SequenceStep(num: Int, type: String, desc: String, effectiveness: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = Dimensions.spacingSmall),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Step Indicator Badge: Uses a 'Surface' with a rounded shape to create a clean circle.
         Surface(
             shape = RoundedCornerShape(20.dp),
             color = Color(0xFF233B90),
-            modifier = Modifier.size(32.dp)
+            modifier = Modifier.size(Dimensions.badgeSize)
         ) {
             Box(contentAlignment = Alignment.Center) {
-                Text("$num", color = Color.White, style = MaterialTheme.typography.bodySmall)
+                Text("$num", color = Color.White, fontSize = Dimensions.badgeFontSize)
             }
         }
 
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(Dimensions.spacingSmall))
 
         // Main content column. Uses weight(1f) to occupy the center space.
         Column(modifier = Modifier.weight(1f)) {
-            Text(type, fontWeight = FontWeight.Bold)
-            Text(desc, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+            Text(type, fontWeight = FontWeight.Bold, fontSize = Dimensions.bodyFontSize)
+            Text(desc, fontSize = Dimensions.labelFontSize, color = Color.Gray)
         }
 
         // Probability percentage displayed in the app's primary color.
-        Text(effectiveness, color = Color(0xFF233B90), fontWeight = FontWeight.Bold)
+        Text(effectiveness, color = Color(0xFF233B90), fontWeight = FontWeight.Bold, fontSize = Dimensions.bodyFontSize)
     }
 }

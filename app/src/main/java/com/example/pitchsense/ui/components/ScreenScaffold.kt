@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.pitchsense.ui.theme.Dimensions
 
 /**
  * A reusable layout wrapper for detail screens (Advanced Stats, Heat Maps, etc.).
@@ -35,9 +36,9 @@ fun ScreenScaffold(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(Dimensions.spacingMedium)
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Dimensions.spacingSmall))
 
             // Standardized back navigation button for consistent UX.
             OutlinedButton(onClick = onBackClick) {
@@ -45,11 +46,11 @@ fun ScreenScaffold(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back"
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Back to Overview")
+                Spacer(modifier = Modifier.width(Dimensions.spacingSmall))
+                Text("Back to Overview", fontSize = Dimensions.bodyFontSize)
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Dimensions.spacingMedium))
 
             // Injects the screen-specific UI content here.
             content()
