@@ -4,11 +4,29 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview. Preview
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.Image
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
+import com.example.pitchsense.R
 import com.example.pitchsense.ui.components.HeaderBar
 import com.example.pitchsense.ui.theme.Dimensions
 import androidx.compose.foundation.Image
@@ -22,33 +40,19 @@ import androidx.compose.foundation.background
 
 
 
-/**
- * The entry screen for user authentication.
- * - Uses 'remember' and 'mutableStateOf' to hold user input locally.
- * - @param onLoginSuccess: A callback triggered when the login button is clicked.
- * This allows the NavGraph to handle the actual screen transition.
- */
+/** Splash/entry screen. No authentication required for MVP. */
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
     LoginScreen(onLoginSuccess = {})
 }
 @Composable
-fun LoginScreen(onLoginSuccess: () -> Unit) {
-    // These variables store the live text entered by the user.
-    // 'remember' ensures the text isn't lost when the screen refreshes.
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-
+fun LoginScreen(onEnter: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            // Ensures the layout doesn't overlap with the system's
-            // gesture/navigation bar at the bottom.
-            .navigationBarsPadding()
     ) {
-        // Reuse the app-wide branding header.
-        HeaderBar(title = "PitchSense Login")
+        HeaderBar(title = "PitchSense")
 
         Box(modifier = Modifier.fillMaxSize()) {
             // Image in the login screen, based on the Team.
@@ -65,56 +69,25 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(Dimensions.spacingMedium),
-            // Centers the login form vertically in the remaining space.
-            verticalArrangement = Arrangement.Top,
+                .background(Color.White)
+                .padding(cardPadding),
+            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(Dimensions.spacingLarge))
-
-            // Baseball team's Name
-            Text(
-                text = "Dodgers",
-                fontSize = Dimensions.titleFontSize,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black,
-                modifier = Modifier.background(Color.White, RoundedCornerShape(8.dp)).padding(Dimensions.spacingSmall)
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            // Standard text field for email capture.
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email", fontSize = Dimensions.labelFontSize) },
-                modifier = Modifier.fillMaxWidth().background(Color.White, RoundedCornerShape(8.dp)),
-                singleLine = true,
-                textStyle = TextStyle(fontSize = Dimensions.bodyFontSize)
-            )
-
-            Spacer(modifier = Modifier.height(Dimensions.spacingMedium))
-
-            // Specialized text field for passwords to mask characters.
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Password", fontSize = Dimensions.labelFontSize) },
-                // Masks the text with dots for security.
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth().background(Color.White, RoundedCornerShape(8.dp)),
-                singleLine = true,
-                textStyle = TextStyle(fontSize = Dimensions.bodyFontSize)
+            Image(
+                painter = painterResource(id = R.drawable.pitchsense_logo),
+                contentDescription = "PitchSense logo",
+                modifier = Modifier.size(300.dp),
+                contentScale = ContentScale.Fit
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // The primary action button.
             Button(
-                onClick = onLoginSuccess,
+                onClick = onEnter,
                 modifier = Modifier.fillMaxWidth().height(Dimensions.buttonHeight)
             ) {
-                Text("Login", fontSize = Dimensions.buttonFontSize)
+                Text("Enter", fontSize = Dimensions.buttonFontSize)
             }
             Spacer(modifier = Modifier.weight(1f))
         }

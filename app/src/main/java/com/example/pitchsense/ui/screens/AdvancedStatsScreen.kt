@@ -1,9 +1,21 @@
 package com.example.pitchsense.ui.screens
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -11,15 +23,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview. Preview
 import androidx.compose.ui.unit.dp
+import com.example.pitchsense.data.model.PitchTypeStat
+import com.example.pitchsense.data.model.StatItem
 import com.example.pitchsense.ui.components.ScreenScaffold
 import com.example.pitchsense.ui.theme.Dimensions
 
-/**
- * Screen designed for in-depth statistical analysis of a batter.
- * - Utilizes 'ScreenScaffold' to inherit consistent padding and back-navigation.
- * - Implements 'verticalScroll' to prevent content clipping on smaller screens or
- * when the data list grows.
- */
+
+/** Advanced metrics screen combining direct Statcast metrics and whiff breakdowns. */
 
 @Preview(showBackground = true)
 @Composable
@@ -27,99 +37,164 @@ fun AdvancedStatsScreenPreview() {
     AdvancedStatsScreen(onBackClick = {})
 }
 @Composable
-fun AdvancedStatsScreen(onBackClick: () -> Unit) {
-    ScreenScaffold(title = "Advanced Batter Statistics", onBackClick = onBackClick) {
+fun AdvancedStatsScreen(
+    batter: String,
+    summaryStats: List<StatItem>,
+    disciplineStats: List<StatItem>,
+    battedBallStats: List<StatItem>,
+    pitchTypeStats: List<PitchTypeStat>,
+    isError: Boolean,
+    isOffline: Boolean,
+    onBackClick: () -> Unit
+) {
+    // Merge source sections, then project into a fixed display order for stable UI.
+    val directMetricMap = (summaryStats + disciplineStats + battedBallStats).associateBy { it.title }
+    val directMetricsOrder = listOf(
+        "xwOBA",
+        "xBA",
+        "xSLG",
+        "Hard Hit%",
+        "Barrel%",
+        "Avg EV",
+        "Max EV",
+        "Sweet Spot%",
+        "Chase%",
+        "Whiff%",
+        "Zone Contact%",
+        "CSW%"
+    )
+    val directMetrics = directMetricsOrder.mapNotNull { directMetricMap[it] }
+
+    ScreenScaffold(title = "Advanced Batter Statistics", onBackClick = onBackClick, isOffline = isOffline) {
+        if (isError) {
+            Text(
+                text = "Unable to load stats. Check that the backend is running.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Gray,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+            return@ScreenScaffold
+        }
+
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Summary Dashboard Card: Highlights elite metrics at a glance.
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F6FF))
             ) {
                 Column(modifier = Modifier.padding(Dimensions.cardPadding)) {
-                    Text("Batter Statistics - Mike Trout", fontSize = Dimensions.titleFontSize)
+                    Text("Direct Statcast Metrics", fontSize = Dimensions.titleFontSize)
+                    Text(
+                        batter,
+                        fontSize = Dimensions.bodyFontSize,
+                        color = Color.Gray
+                    )
                     Spacer(modifier = Modifier.height(Dimensions.spacingMedium))
 
-                    // First row of summary stats.
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                        AdvancedStatItem("BA vs RHP", ".298")
-                        AdvancedStatItem("BA vs LHP", ".265")
-                        AdvancedStatItem("Hard Hit%", "45.2%")
-                    }
-
-                    Spacer(modifier = Modifier.height(Dimensions.spacingMedium))
-
-                    // Second row of summary stats.
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                        AdvancedStatItem("Barrel%", "12.8%")
-                        AdvancedStatItem("SLG", ".512")
-                        AdvancedStatItem("OPS", ".874")
+                    // Render as a compact 3-column grid.
+                    directMetrics.chunked(3).forEach { rowStats ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            rowStats.forEach { stat ->
+                                CompactMetricCard(
+                                    label = stat.title,
+                                    value = stat.value,
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxSize()
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(Dimensions.spacingSmall))
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(Dimensions.spacingLarge))
-
-            // Detailed Breakdown Section: Performance categorized by pitch type.
-            Text("Performance vs Pitch Type", fontSize = Dimensions.titleFontSize)
-            Spacer(modifier = Modifier.height(Dimensions.spacingSmall))
-
-            // Custom Table Header: Uses 'Modifier.weight' to align with data rows below.
-            Row(
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = Dimensions.spacingSmall),
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .weight(0.45f),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF7F9FC))
             ) {
-                Text("Pitch", modifier = Modifier.weight(2f), fontWeight = FontWeight.Bold, fontSize = Dimensions.labelFontSize)
-                Text("BA", modifier = Modifier.weight(1f), fontWeight = FontWeight.Bold, fontSize = Dimensions.labelFontSize)
-                Text("SLG", modifier = Modifier.weight(1f), fontWeight = FontWeight.Bold, fontSize = Dimensions.labelFontSize)
-                Text("Whiff", modifier = Modifier.weight(1f), fontWeight = FontWeight.Bold, fontSize = Dimensions.labelFontSize)
-            }
-            HorizontalDivider()
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(Dimensions.spacingSmall),
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Whiff by Pitch Type", fontSize = Dimensions.labelFontSize, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(Dimensions.spacingSmall))
 
-            // Dynamic Data Rows: Encapsulated logic for clean, repeated UI elements.
-            PitchTypeRow("4-Seam Fastball", ".312", ".587", "18.5%")
-            PitchTypeRow("Slider", ".218", ".385", "35.8%")
-            PitchTypeRow("Changeup", ".245", ".421", "28.3%")
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("Pitch", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+                        Text("Whiff", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+                    }
+
+                    HorizontalDivider(color = Color(0xFFD7DEE8))
+
+                    Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        pitchTypeStats.forEach { stat ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 4.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = stat.pitch,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = stat.whiff,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            HorizontalDivider(color = Color(0xFFE6ECF3))
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
-/**
- * A small, vertical widget for displaying a single metric label and its value.
- * - Centers content for a "dashboard" look.
- * - Standardizes font weights and colors for labels.
- */
+/** Displays one value cell in the direct-metrics grid without extra card chrome. */
 @Composable
-fun AdvancedStatItem(label: String, value: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(label, fontSize = Dimensions.labelFontSize, color = Color.Gray)
-        Text(value, fontSize = Dimensions.titleFontSize, fontWeight = FontWeight.Bold)
-    }
-}
-
-/**
- * Represents a single row in the 'Performance vs Pitch Type' table.
- * - Uses 'weight' ratios (2:1:1:1) to ensure columns align perfectly across rows.
- * - Includes a subtle divider to improve horizontal scanning for the user.
- */
-@Composable
-fun PitchTypeRow(name: String, ba: String, slg: String, whiff: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = Dimensions.spacingSmall),
-        horizontalArrangement = Arrangement.SpaceBetween
+private fun CompactMetricCard(label: String, value: String, modifier: Modifier = Modifier) {
+    // Minimal card used by the direct metrics grid.
+    Surface(
+        modifier = modifier,
+        color = Color.White,
+        shape = RoundedCornerShape(10.dp)
     ) {
-        // Pitch name gets more space (weight 2) to accommodate longer text.
-        Text(name, modifier = Modifier.weight(2f), fontSize = Dimensions.bodyFontSize)
-        Text(ba, modifier = Modifier.weight(1f), fontSize = Dimensions.bodyFontSize)
-        Text(slg, modifier = Modifier.weight(1f), fontSize = Dimensions.bodyFontSize)
-        Text(whiff, modifier = Modifier.weight(1f), fontSize = Dimensions.bodyFontSize)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(vertical = 10.dp, horizontal = 8.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(label, fontSize = Dimensions.bodyFontSize, color = Color.Gray)
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(value, fontSize = Dimensions.titleFontSize, fontWeight = FontWeight.Bold)
+        }
     }
-    HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
 }
