@@ -19,7 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+//import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,19 +27,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview. Preview
+//import androidx.compose.ui.tooling.preview. Preview
 import androidx.compose.ui.unit.dp
 import com.example.pitchsense.data.model.SequenceRecommendation
 import com.example.pitchsense.ui.components.ScreenScaffold
 import com.example.pitchsense.ui.theme.Dimensions
-import androidx.compose.ui.text.TextStyle
+//import androidx.compose.ui.text.TextStyle
 import com.example.pitchsense.ui.components.ToggleButton
 
-@Preview(showBackground = true)
-@Composable
-fun PitchSequenceScreenPreview() {
-    PitchSequenceScreen(onBackClick = {})
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PitchSequenceScreenPreview() {
+
+//}
 
 /** Sequence recommendation screen driven by user-selected game context. */
 @Composable
@@ -131,7 +131,7 @@ fun PitchSequenceScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             Text("Game Situation (Optional)", fontSize = Dimensions.titleFontSize)
-            Spacer(modifier = Modifier.height(spacingSmall))
+            Spacer(modifier = Modifier.height(Dimensions.spacingSmall))
 
             CountCircles(
                 label = "Inning",
@@ -143,7 +143,7 @@ fun PitchSequenceScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(spacingSmall))
+            Spacer(modifier = Modifier.height(Dimensions.spacingSmall))
 
             CountCircles(
                 label = "Pitches to Predict",
@@ -154,9 +154,9 @@ fun PitchSequenceScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(spacingSmall))
+            Spacer(modifier = Modifier.height(Dimensions.spacingSmall))
 
-            Row(horizontalArrangement = Arrangement.spacedBy(spacingSmall)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.spacingSmall)) {
                 CountCircles(
                     label = "Balls",
                     selectedCount = ballsValue,
@@ -176,7 +176,7 @@ fun PitchSequenceScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(spacingSmall))
+            Spacer(modifier = Modifier.height(Dimensions.spacingSmall))
 
             CountCircles(
                 label = "Outs",
@@ -187,11 +187,11 @@ fun PitchSequenceScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(spacingMedium))
+            Spacer(modifier = Modifier.height(Dimensions.spacingMedium))
             Text("Runners on Base", style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(spacingSmall))
+            Spacer(modifier = Modifier.height(Dimensions.spacingSmall))
 
-            Row(horizontalArrangement = Arrangement.spacedBy(spacingMedium)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.spacingMedium)) {
                 ToggleButton(
                     text = "1B",
                     isSelected = runnerOnFirst,
@@ -215,12 +215,12 @@ fun PitchSequenceScreen(
                 onClick = onGenerateUpdatedSequence,
                 modifier = Modifier.fillMaxWidth().height(Dimensions.spacingLarge)
             ) {
-                Text("Generate Updated Sequence")
+                Text("Generate Updated Sequence", fontSize = Dimensions.buttonFontSize)
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Text("Recommended Pitch Sequence vs. $batter", fontSize = Dimensions.titleFontSize)
+            Text("Recommended Pitch Sequence vs. $batter", fontSize = Dimensions.bodyFontSize)
             Spacer(modifier = Modifier.height(Dimensions.spacingMedium))
             Surface(
                 shape = RoundedCornerShape(Dimensions.spacingMedium),

@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.tooling.preview. Preview
+//import androidx.compose.material3.*
+//import androidx.compose.runtime.*
+//import androidx.compose.ui.tooling.preview. Preview
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
@@ -38,10 +38,10 @@ import com.example.pitchsense.ui.components.HeaderBar
 import com.example.pitchsense.ui.components.OfflineBanner
 import com.example.pitchsense.ui.components.StatCard
 import com.example.pitchsense.ui.theme.Dimensions
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.Alignment
+//import androidx.compose.ui.text.TextStyle
+//import androidx.compose.ui.graphics.Color
+//import androidx.compose.ui.text.font.FontWeight
+//import androidx.compose.ui.Alignment
 
 
 import java.text.Normalizer
@@ -52,15 +52,10 @@ import java.text.Normalizer
  * @param order 1-based lineup position; used to prefix the player name in the dropdown
  *              (e.g., "3. Vladimir Guerrero Jr.") so batting order remains visible.
  */
-@Preview(showBackground = true)
-@Composable
-fun OverviewScreenPreview() {
-    OverviewScreen(
-        onNavigateToAdvancedStats = {},
-        onNavigateToHeatMap = {},
-        onNavigateToPitchSequence = {}
-    )
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun OverviewScreenPreview()
+//}
 private data class BatterLineupMeta(
     val order: Int
 )
@@ -139,13 +134,13 @@ fun OverviewScreen(
         // Amber banner shown whenever data is sourced from local demo fallback.
         if (isOffline) OfflineBanner()
 
-        Column(modifier = Modifier.padding(spacingMedium)) {
-            Spacer(modifier = Modifier.height(spacingMedium))
+        Column(modifier = Modifier.padding(Dimensions.spacingMedium)) {
+            Spacer(modifier = Modifier.height(Dimensions.spacingMedium))
 
-            Row(horizontalArrangement = Arrangement.spacedBy(spacingSmall)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.spacingSmall)) {
                 Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                     PlayerHeadshot(playerName = selectedBatter, rolePrefix = "batter")
-                    Spacer(modifier = Modifier.height(spacingSmall))
+                    Spacer(modifier = Modifier.height(Dimensions.spacingSmall))
                     BatterDropdown(
                         label = "Choose Batter (Required)",
                         options = orderedBatterOptions,
@@ -158,7 +153,7 @@ fun OverviewScreen(
 
                 Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                     PlayerHeadshot(playerName = selectedPitcher, rolePrefix = "pitcher")
-                    Spacer(modifier = Modifier.height(spacingSmall))
+                    Spacer(modifier = Modifier.height(Dimensions.spacingSmall))
                     PitcherDropdown(
                         label = "Choose Pitcher (Optional)",
                         options = orderedPitcherOptions,
@@ -170,14 +165,14 @@ fun OverviewScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(spacingMedium))
+            Spacer(modifier = Modifier.height(Dimensions.spacingMedium))
 
             if (isError) {
                 Text(
                     text = "Unable to load stats. Check that the backend is running.",
                     fontSize = Dimensions.labelFontSize,
                     color = Color.Gray,
-                    modifier = Modifier.padding(top = spacingSmall)
+                    modifier = Modifier.padding(top = Dimensions.spacingSmall)
                 )
             } else if (selectedPitcher.isBlank()) {
                 Box(
@@ -221,7 +216,7 @@ fun OverviewScreen(
                     Text("Batter Heat Maps", fontSize = Dimensions.buttonFontSize)
                 }
             }
-            Spacer(modifier = Modifier.height(spacingSmall))
+            Spacer(modifier = Modifier.height(Dimensions.spacingSmall))
             Button(onClick = onNavigateToPitchSequence, modifier = Modifier.fillMaxWidth().height(52.dp)) {
                 Text("Recommend Pitch Sequence", fontSize = Dimensions.buttonFontSize)
             }
@@ -277,7 +272,7 @@ private fun PitcherDropdown(
                         text = {
                             Text(
                                 text = role.header,
-                                fontSize = Dimensions.titleFontSize,
+                                fontSize = Dimensions.smallbodyFontSize,
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFF233B90)
                             )
@@ -287,7 +282,7 @@ private fun PitcherDropdown(
 
                     pitchersInRole.forEach { option ->
                         DropdownMenuItem(
-                            text = { Text(option, fontSize = Dimensions.titleFontSize) },
+                            text = { Text(option, fontSize = Dimensions.smallbodyFontSize) },
                             onClick = {
                                 onOptionSelected(option)
                                 expanded = false
@@ -358,7 +353,7 @@ private fun BatterDropdown(
                     text = {
                         Text(
                             text = displayText,
-                            fontSize = Dimensions.buttonFontSize
+                            fontSize = Dimensions.smallbodyFontSize
                         )
                     },
                     onClick = {
@@ -493,7 +488,7 @@ private fun StatsDataColumn(
     Column(modifier = modifier) {
         Text(title, fontSize = Dimensions.bodyFontSize)
         Text(subtitle, fontSize = Dimensions.bodyFontSize, color = Color.Gray)
-        Spacer(modifier = Modifier.height(spacingSmall))
+        Spacer(modifier = Modifier.height(Dimensions.spacingSmall))
 
         stats.forEach { stat ->
             StatCard(
@@ -502,7 +497,7 @@ private fun StatsDataColumn(
                 isPrimary = stat.isPrimary,
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(spacingSmall))
+            Spacer(modifier = Modifier.height(Dimensions.spacingSmall))
         }
     }
 }

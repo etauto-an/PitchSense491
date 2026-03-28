@@ -24,9 +24,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview. Preview
+//import androidx.compose.ui.tooling.preview. Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+//import androidx.compose.ui.unit.sp
 import com.example.pitchsense.data.model.HeatLevel
 import com.example.pitchsense.data.model.HeatMapCell
 import com.example.pitchsense.ui.components.LegendItem
@@ -35,11 +35,11 @@ import com.example.pitchsense.ui.components.ToggleButton
 import com.example.pitchsense.ui.theme.Dimensions
 
 /** Heat-map screen with metric toggles, zone grid, and performance legend. */
-@Preview(showBackground = true)
-@Composable
-fun HeatMapScreenPreview() {
-    HeatMapScreen(onBackClick = {})
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun HeatMapScreenPreview() {
+
+//}
 
 @Composable
 fun HeatMapScreen(
@@ -96,7 +96,7 @@ fun HeatMapScreen(
                     ) {
                         // Square strike-zone grid with 5x5 buckets.
                         HeatMapGrid(heatMap = heatMap)
-                        Spacer(modifier = Modifier.height(spacingSmall))
+                        Spacer(modifier = Modifier.height(Dimensions.spacingSmall))
                         Text(
                             text = "Strike Zone View (Catcher's Perspective)",
                             style = MaterialTheme.typography.bodySmall,
@@ -106,9 +106,9 @@ fun HeatMapScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(spacingMedium))
+            Spacer(modifier = Modifier.height(Dimensions.spacingMedium))
             HorizontalDivider(color = Color(0xFFE0E0E0))
-            Spacer(modifier = Modifier.height(spacingMedium))
+            Spacer(modifier = Modifier.height(Dimensions.spacingMedium))
 
             Box(
                 modifier = Modifier.fillMaxWidth(),
@@ -120,7 +120,7 @@ fun HeatMapScreen(
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
-                    Spacer(modifier = Modifier.height(spacingSmall))
+                    Spacer(modifier = Modifier.height(Dimensions.spacingSmall))
                     // Threshold labels vary by metric — use MLB-standard benchmarks for each.
                     val (elite, excellent, belowAvg, weak) = when (selectedMetric) {
                         "SLG" -> listOf(".600+ (Elite)", ".500-.599 (Excellent)", ".350-.399 (Below Avg)", "<.350 (Weak)")

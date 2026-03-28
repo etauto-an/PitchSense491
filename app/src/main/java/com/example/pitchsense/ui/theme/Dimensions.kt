@@ -38,12 +38,14 @@ object Dimensions {
     val labelFontSize @Composable get() = if (isTablet()) 25.sp else 11.sp
     val gridTextSize @Composable get() = if (isTablet()) 25.sp else 10.sp
 
+    val smallbodyFontSize @Composable get() = if (isTablet()) 20.sp else 3.sp
+
     val badgeSize @Composable get() = if (isTablet()) 52.dp else 32.dp
     val badgeFontSize @Composable get() = if (isTablet()) 18.sp else 12.sp
 
     // This is for changes in buttons.
     val buttonHeight @Composable get() = if (isTablet()) 64.dp else 48.dp
-    val buttonFontSize @Composable get() = if (isTablet()) 30.sp else 15.sp
+    val buttonFontSize @Composable get() = if (isTablet()) 25.sp else 15.sp
 
     // This is for changes in spacing.
     val cardPadding @Composable get() = if (isTablet()) 24.dp else 12.dp

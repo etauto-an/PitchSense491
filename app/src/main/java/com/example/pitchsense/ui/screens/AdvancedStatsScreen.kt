@@ -21,7 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview. Preview
+//import androidx.compose.ui.tooling.preview. Preview
 import androidx.compose.ui.unit.dp
 import com.example.pitchsense.data.model.PitchTypeStat
 import com.example.pitchsense.data.model.StatItem
@@ -31,11 +31,11 @@ import com.example.pitchsense.ui.theme.Dimensions
 
 /** Advanced metrics screen combining direct Statcast metrics and whiff breakdowns. */
 
-@Preview(showBackground = true)
-@Composable
-fun AdvancedStatsScreenPreview() {
-    AdvancedStatsScreen(onBackClick = {})
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun AdvancedStatsScreenPreview() {
+
+//}
 @Composable
 fun AdvancedStatsScreen(
     batter: String,
