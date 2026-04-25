@@ -141,7 +141,14 @@ paths:
       operationId: recommendPitchSequence
       x-internal-notes:
         adapter:
-          model_endpoint: "POST http://127.0.0.1:5000/recommend/sequence"
+          model_endpoint: "POST http://127.0.0.1:5001/recommend/sequence"
+          pitcher_id_validation: >
+            Validate batterId against Statcast (404 NOT_FOUND if unknown).
+            Do NOT pre-flight pitcherId against Statcast — pass it through to the model.
+            If the model returns no sequences for the given pitcherId, return 502.
+          model_availability: >
+            Timeout: 10 seconds. On timeout or non-2xx model response, return 502 Bad Gateway.
+            Do not silently fall back to fake data — the client handles offline state.
           request_mapping:
             batter: "batterId (MLBAM ID; cast to integer if model requires numeric)"
             pitcher: "pitcherId (MLBAM ID; cast to integer if model requires numeric)"
@@ -150,6 +157,9 @@ paths:
             on_1b: "runnerOnFirst ? 1 : 0"
             on_2b: "runnerOnSecond ? 1 : 0"
             on_3b: "runnerOnThird ? 1 : 0"
+            inning_note: >
+              inning is NOT forwarded to the model. It is consumed by the API layer only
+              to derive appliedScenario (see appliedScenario_rules below).
           model_response_example:
             batter: 665489
             count: "0-2"

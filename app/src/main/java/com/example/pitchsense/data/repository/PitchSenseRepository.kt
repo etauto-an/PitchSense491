@@ -47,6 +47,8 @@ interface PitchSenseRepository {
         inning: String,
         runnerOnFirst: Boolean,
         runnerOnSecond: Boolean,
-        runnerOnThird: Boolean
+        runnerOnThird: Boolean,
+        /** How many times the pitcher has faced this batting order (1, 2, or 3+). Null means unknown. */
+        timesThrough: Int? = null
     ): Pair<String, List<SequenceRecommendation>>
 }

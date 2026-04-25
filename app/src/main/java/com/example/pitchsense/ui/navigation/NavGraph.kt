@@ -1,6 +1,7 @@
 package com.example.pitchsense.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -43,6 +44,9 @@ fun PitchSenseApp() {
 
         // Primary landing/dashboard screen.
         composable("overview") {
+            LaunchedEffect(Unit) {
+                vm.onOverviewVisible()
+            }
             OverviewScreen(
                 selectedBatter = state.selectedBatter,
                 selectedPitcher = state.selectedPitcher,
@@ -62,6 +66,9 @@ fun PitchSenseApp() {
 
         // Detailed advanced metrics destination.
         composable("advanced_stats") {
+            LaunchedEffect(Unit) {
+                vm.onAdvancedVisible()
+            }
             AdvancedStatsScreen(
                 batter = state.selectedBatter,
                 summaryStats = state.advancedSummaryStats,
@@ -76,6 +83,9 @@ fun PitchSenseApp() {
 
         // Strike-zone heat map analysis destination.
         composable("heat_map") {
+            LaunchedEffect(Unit) {
+                vm.onHeatMapVisible()
+            }
             HeatMapScreen(
                 batter = state.selectedBatter,
                 selectedMetric = state.selectedHeatMetric,
@@ -109,7 +119,10 @@ fun PitchSenseApp() {
                 generatedRunnerOnThird = state.generatedRunnerOnThird,
                 appliedScenario = state.appliedScenario,
                 sequence = state.recommendedSequence,
+                isLoading = state.isPitchSequenceLoading,
                 isOffline = state.isOffline,
+                timesThrough = state.timesThrough,
+                onTimesThroughChanged = vm::onTimesThroughChanged,
                 onPitchesToPredictChanged = vm::onPitchesToPredictChanged,
                 onBallsChanged = vm::onBallsChanged,
                 onStrikesChanged = vm::onStrikesChanged,

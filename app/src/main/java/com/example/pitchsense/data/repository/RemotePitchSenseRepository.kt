@@ -94,7 +94,8 @@ class RemotePitchSenseRepository(
         inning: String,
         runnerOnFirst: Boolean,
         runnerOnSecond: Boolean,
-        runnerOnThird: Boolean
+        runnerOnThird: Boolean,
+        timesThrough: Int?
     ): Pair<String, List<SequenceRecommendation>> {
         val body = api.recommendSequence(
             PitchSequenceRequestDto(
@@ -109,7 +110,8 @@ class RemotePitchSenseRepository(
                     runnerOnFirst = runnerOnFirst,
                     runnerOnSecond = runnerOnSecond,
                     runnerOnThird = runnerOnThird
-                )
+                ),
+                timesThrough = timesThrough
             )
         )
         return Pair(

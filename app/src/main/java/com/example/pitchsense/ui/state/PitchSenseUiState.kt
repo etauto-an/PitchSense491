@@ -29,20 +29,25 @@ data class PitchSenseUiState(
     val balls: String = "0",
     val strikes: String = "0",
     val outs: String = "0",
-    val inning: String = "",
+    // Defaults to "1" so generated pitch-sequence requests satisfy the backend
+    // contract, which requires an inning between 1 and 9.
+    val inning: String = "1",
     val runnerOnFirst: Boolean = false,
     val runnerOnSecond: Boolean = false,
     val runnerOnThird: Boolean = false,
+    /** How many times the pitcher has faced this batting order (1, 2, or 3). Null = not set. */
+    val timesThrough: Int? = null,
 
     // Snapshot of the last-submitted pitch sequence inputs, shown alongside the results.
     val generatedPitchesToPredict: String = "3",
     val generatedBalls: String = "0",
     val generatedStrikes: String = "0",
     val generatedOuts: String = "0",
-    val generatedInning: String = "",
+    val generatedInning: String = "1",
     val generatedRunnerOnFirst: Boolean = false,
     val generatedRunnerOnSecond: Boolean = false,
     val generatedRunnerOnThird: Boolean = false,
+    val generatedTimesThrough: Int? = null,
 
     // Loaded async by ViewModel — default to empty until first fetch completes.
     val overviewGeneral: List<StatItem> = emptyList(),
@@ -54,6 +59,9 @@ data class PitchSenseUiState(
     val heatMap: List<List<HeatMapCell>> = emptyList(),
     val appliedScenario: String = "",
     val recommendedSequence: List<SequenceRecommendation> = emptyList(),
+
+    // True while the pitch sequence API call is in flight; used to show a loading indicator.
+    val isPitchSequenceLoading: Boolean = false,
 
     // Set to true when a backend fetch fails so screens can show an error instead of empty content.
     val overviewError: Boolean = false,

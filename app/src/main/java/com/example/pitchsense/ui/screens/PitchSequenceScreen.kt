@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -54,12 +55,15 @@ fun PitchSequenceScreen(
     generatedRunnerOnThird: Boolean,
     appliedScenario: String,
     sequence: List<SequenceRecommendation>,
+    isLoading: Boolean,
     isOffline: Boolean,
     onPitchesToPredictChanged: (String) -> Unit,
     onBallsChanged: (String) -> Unit,
     onStrikesChanged: (String) -> Unit,
     onOutsChanged: (String) -> Unit,
     onInningChanged: (String) -> Unit,
+    timesThrough: Int?,
+    onTimesThroughChanged: (Int?) -> Unit,
     onRunnerOnFirstChanged: (Boolean) -> Unit,
     onRunnerOnSecondChanged: (Boolean) -> Unit,
     onRunnerOnThirdChanged: (Boolean) -> Unit,
@@ -114,6 +118,8 @@ fun PitchSequenceScreen(
     val strikesValue = (strikes.toIntOrNull() ?: 0).coerceIn(0, 2)
     val pitchesToPredictValue = (pitchesToPredict.toIntOrNull() ?: 3).coerceIn(1, 3)
     val outsValue = (outs.toIntOrNull() ?: 0).coerceIn(0, 2)
+    val canGenerateSequence = pitcher.isNotBlank()
+    val hasSequenceResult = isLoading || sequence.isNotEmpty()
 
     ScreenScaffold(title = "Recommend Pitch Sequence", onBackClick = onBackClick, isOffline = isOffline) {
         Column(
@@ -178,6 +184,37 @@ fun PitchSequenceScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Times Through Order — tapping the active selection deselects it (null = unknown).
+            Column {
+                Text("Times Through Order", style = MaterialTheme.typography.titleMedium, color = Color.Gray)
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                    listOf(1, 2, 3).forEach { n ->
+                        val isSelected = timesThrough == n
+                        Surface(
+                            modifier = Modifier
+                                .size(34.dp)
+                                .clickable { onTimesThroughChanged(if (isSelected) null else n) },
+                            shape = CircleShape,
+                            color = if (isSelected) Color(0xFF00796B) else Color.Transparent,
+                            border = androidx.compose.foundation.BorderStroke(3.dp, Color(0xFF00796B))
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(
+                                    // The third bucket covers 3+ times through order.
+                                    text = if (n == 3) "3+" else n.toString(),
+                                    color = if (isSelected) Color.White else Color(0xFF00796B),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
             Text("Runners on Base", style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(8.dp))
@@ -204,6 +241,7 @@ fun PitchSequenceScreen(
 
             Button(
                 onClick = onGenerateUpdatedSequence,
+                enabled = canGenerateSequence && !isLoading,
                 modifier = Modifier.fillMaxWidth().height(52.dp)
             ) {
                 Text("Generate Updated Sequence")
@@ -211,41 +249,60 @@ fun PitchSequenceScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Text("Recommended Pitch Sequence vs. $batter", style = MaterialTheme.typography.titleLarge)
-            Spacer(modifier = Modifier.height(8.dp))
-            Surface(
-                shape = RoundedCornerShape(20.dp),
-                color = Color(0xFFE8EEF9)
-            ) {
+            if (hasSequenceResult) {
+                Text("Recommended Pitch Sequence vs. $batter", style = MaterialTheme.typography.titleLarge)
+                Spacer(modifier = Modifier.height(8.dp))
+                Surface(
+                    shape = RoundedCornerShape(20.dp),
+                    color = Color(0xFFE8EEF9)
+                ) {
+                    Text(
+                        text = "Applied Scenario: $scenarioTag",
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                        color = Color(0xFF233B90),
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (isLoading) {
+                    // Centered spinner shown while the sequence API call is in flight.
+                    Box(modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = Color(0xFF233B90))
+                    }
+                } else {
+                    sequence.forEach { step ->
+                        SequenceStep(
+                            num = step.step,
+                            type = step.pitchType,
+                            desc = step.description,
+                            effectiveness = step.effectiveness
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFFFFFDE7), RoundedCornerShape(12.dp))
+                        .padding(24.dp)
+                ) {
+                    Text(
+                        "Analysis: Based on $batter's weaknesses, $pitcher's arsenal strengths, count ($countLabel), outs ($outsLabel), and current base state ($runnerSituation).",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            } else {
                 Text(
-                    text = "Applied Scenario: $scenarioTag",
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                    color = Color(0xFF233B90),
-                    style = MaterialTheme.typography.labelLarge
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-
-            sequence.forEach { step ->
-                SequenceStep(
-                    num = step.step,
-                    type = step.pitchType,
-                    desc = step.description,
-                    effectiveness = step.effectiveness
-                )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFFFFFDE7), RoundedCornerShape(12.dp))
-                    .padding(24.dp)
-            ) {
-                Text(
-                    "Analysis: Based on $batter's weaknesses, $pitcher's arsenal strengths, count ($countLabel), outs ($outsLabel), and current base state ($runnerSituation).",
-                    style = MaterialTheme.typography.bodyMedium
+                    text = if (canGenerateSequence) {
+                        "Generate a sequence to see recommendations."
+                    } else {
+                        "Select a pitcher to generate a recommendation."
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
                 )
             }
         }

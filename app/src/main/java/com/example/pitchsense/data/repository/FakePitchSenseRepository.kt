@@ -147,7 +147,8 @@ class FakePitchSenseRepository : PitchSenseRepository {
         inning: String,
         runnerOnFirst: Boolean,
         runnerOnSecond: Boolean,
-        runnerOnThird: Boolean
+        runnerOnThird: Boolean,
+        timesThrough: Int?
     ): Pair<String, List<SequenceRecommendation>> {
         // Derive leverage signals from inning/outs/base-runner state.
         val inningNumber = inning.toIntOrNull() ?: 1

@@ -96,25 +96,43 @@ Login is cleared from the back stack — pressing back from Overview exits the a
 
 ### Running against a local backend
 
-The backend lives in `backend/` and requires Python 3.10+.
+The app has two backend components that must both be running for all screens to work:
+
+| Service | Directory | Port | Purpose |
+|---|---|---|---|
+| Backend API | `backend/` | 5000 | Statcast stats, heat map, sequence endpoint |
+| ML model service | `ML/` | 5001 | Beam-search pitch sequence inference |
+
+**1. Start the ML model service** (requires a trained model — see `ML/README.md`):
+
+```bash
+cd ML
+source .venv/bin/activate
+MODEL_DIR=models/Test_v9_outs \
+DATA_PATH=data/processed/outcomes_with_outs.parquet \
+python src/serve.py
+```
+
+**2. Start the backend API** (in a second terminal):
 
 ```bash
 cd backend
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+source .venv/bin/activate
 python app.py          # starts on http://0.0.0.0:5000
 ```
 
-Then set in `gradle.properties`:
+`gradle.properties` is already configured for the emulator:
 
 ```properties
 PITCHSENSE_USE_REMOTE_API=true
 PITCHSENSE_API_BASE_URL=http://10.0.2.2:5000/api/v1/
 ```
 
-> `10.0.2.2` is the Android emulator's alias for `localhost`. For a physical device, use your machine's local network IP (e.g. `192.168.1.42`).
+> `10.0.2.2` is the Android emulator's alias for `localhost`. For a physical device, replace it with your machine's local network IP (e.g. `192.168.1.42`).
 >
-> The first request for a given batter fetches live data from Baseball Savant via `pybaseball` (5–15 s). Subsequent requests hit the in-memory cache.
+> The first request for a given batter fetches live Statcast data from Baseball Savant via `pybaseball` (5–15 s). Subsequent requests hit the in-memory cache.
+>
+> The ML model service loads PyTorch weights at startup (~5 s). The first pitch sequence request may be slower than subsequent ones.
 
 ---
 

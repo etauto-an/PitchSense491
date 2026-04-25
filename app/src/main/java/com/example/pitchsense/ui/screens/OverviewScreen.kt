@@ -187,6 +187,7 @@ fun OverviewScreen(
                         title = "Pitcher Specific",
                         subtitle = "$selectedBatter vs. $selectedPitcher",
                         stats = pitcherSpecificStats,
+                        emptyMessage = "No matchup data available for this batter and pitcher.",
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -469,12 +470,23 @@ private fun StatsDataColumn(
     title: String,
     subtitle: String,
     stats: List<StatItem>,
+    emptyMessage: String? = null,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
         Text(title, style = MaterialTheme.typography.titleMedium)
         Text(subtitle, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
         Spacer(modifier = Modifier.height(8.dp))
+
+        if (stats.isEmpty() && emptyMessage != null) {
+            Text(
+                text = emptyMessage,
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Gray,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+            return
+        }
 
         stats.forEach { stat ->
             StatCard(

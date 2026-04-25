@@ -36,6 +36,7 @@ or `"808967"` for Yoshinobu Yamamoto). Display names remain UI-only labels.
 Error codes in use:
 - `VALIDATION_ERROR` — `400` bad/missing parameters
 - `NOT_FOUND` — `404` unknown `batterId` or `pitcherId`
+- `MODEL_UNAVAILABLE` — `502` ML model service unreachable or returned an error
 
 ## 1) Overview Cards
 
@@ -190,8 +191,20 @@ Response `200`:
 
 The backend may keep the trained model service contract unchanged and translate at the API layer.
 
-Internal model endpoint (example from backend team):
-- `POST http://127.0.0.1:5000/recommend/sequence`
+Internal model endpoint:
+- `POST http://127.0.0.1:5001/recommend/sequence`
+
+> Port 5001 is used to avoid conflicting with the backend Flask app, which runs on port 5000.
+
+### pitcherId validation
+Validate `batterId` against Statcast (same as the other endpoints — return `404 NOT_FOUND` if unknown).
+Do **not** pre-flight `pitcherId` against Statcast; pass it through to the model as-is.
+If the model returns no sequences for a given `pitcherId`, surface a `502` rather than a `404`.
+
+### Model service availability
+- Set a timeout of **10 seconds** on calls to the model endpoint.
+- On timeout or any non-2xx response from the model, return `502 Bad Gateway` to the client.
+- Do not implement a silent fallback to fake data — the client handles offline display on its side.
 
 ### API request -> model request mapping
 - `batter` <- `batterId` (MLBAM ID; cast to number if model requires integer)
@@ -201,6 +214,9 @@ Internal model endpoint (example from backend team):
 - `on_1b` <- `runnerOnFirst ? 1 : 0`
 - `on_2b` <- `runnerOnSecond ? 1 : 0`
 - `on_3b` <- `runnerOnThird ? 1 : 0`
+
+> **`inning` is not forwarded to the model.** It is consumed entirely on the API layer to derive
+> `appliedScenario` (see the `appliedScenario` rules below). The model does not accept or use it.
 
 Expected model response shape:
 ```json

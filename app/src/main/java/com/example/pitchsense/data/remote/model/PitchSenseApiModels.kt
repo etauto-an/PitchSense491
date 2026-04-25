@@ -87,7 +87,9 @@ data class PitchSequenceRequestDto(
     val batterId: String,
     val pitcherId: String,
     val pitchesToPredict: Int,
-    val gameSituation: GameSituationDto
+    val gameSituation: GameSituationDto,
+    /** How many times the pitcher has faced this batting order (1, 2, or 3+). Null means unknown. */
+    val timesThrough: Int? = null
 )
 
 /** One recommended pitch step in the sequence response (e.g. step 1: Slider, low and away). */

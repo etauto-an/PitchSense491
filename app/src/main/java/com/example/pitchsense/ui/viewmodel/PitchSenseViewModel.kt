@@ -1,5 +1,6 @@
 package com.example.pitchsense.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pitchsense.data.model.PlayerOption
@@ -18,6 +19,10 @@ class PitchSenseViewModel(
     private val repository: PitchSenseRepository = RepositoryProvider.create()
 ) : ViewModel() {
 
+    companion object {
+        private const val TAG = "PitchSenseViewModel"
+    }
+
     // Fallback data source used when the live API is unreachable. Always available locally.
     private val fallback = FakePitchSenseRepository()
 
@@ -26,6 +31,9 @@ class PitchSenseViewModel(
     private val pitcherOptions: List<PlayerOption> = repository.pitcherOptions()
     private val batterByDisplayName = batterOptions.associateBy { it.displayName }
     private val pitcherByDisplayName = pitcherOptions.associateBy { it.displayName }
+    private var hasLoadedOverview = false
+    private var hasLoadedAdvanced = false
+    private var hasLoadedHeatMap = false
 
     // Initialize defaults from available options so UI starts with valid selections.
     private val _uiState = MutableStateFlow(
@@ -38,17 +46,31 @@ class PitchSenseViewModel(
     /** Read-only state stream observed by Compose. */
     val uiState: StateFlow<PitchSenseUiState> = _uiState.asStateFlow()
 
-    init {
-        loadOverview()
-        loadAdvanced()
-        loadHeatMap()
-        loadPitchSequence()
-    }
-
     /** Returns cached batter options for selector controls. */
     fun getBatterOptions(): List<String> = batterOptions.map { it.displayName }
     /** Returns cached pitcher options for selector controls. */
     fun getPitcherOptions(): List<String> = pitcherOptions.map { it.displayName }
+
+    /** Loads overview data the first time the overview destination becomes visible. */
+    fun onOverviewVisible() {
+        if (!hasLoadedOverview) {
+            loadOverview()
+        }
+    }
+
+    /** Loads advanced stats the first time the advanced destination becomes visible. */
+    fun onAdvancedVisible() {
+        if (!hasLoadedAdvanced) {
+            loadAdvanced()
+        }
+    }
+
+    /** Loads the selected heat-map metric the first time the heat-map destination becomes visible. */
+    fun onHeatMapVisible() {
+        if (!hasLoadedHeatMap) {
+            loadHeatMap()
+        }
+    }
 
     /** Applies a new batter selection and refreshes every batter-dependent screen section. */
     fun onBatterSelected(value: String) {
@@ -60,8 +82,9 @@ class PitchSenseViewModel(
             )
         }
         loadOverview()
-        loadAdvanced()
-        loadHeatMap()
+        if (hasLoadedAdvanced) loadAdvanced()
+        if (hasLoadedHeatMap) loadHeatMap()
+        _uiState.update { it.copy(appliedScenario = "", recommendedSequence = emptyList()) }
     }
 
     /** Applies a pitcher filter and reloads only the overview data that depends on that matchup. */
@@ -74,6 +97,7 @@ class PitchSenseViewModel(
             )
         }
         loadOverview()
+        _uiState.update { it.copy(appliedScenario = "", recommendedSequence = emptyList()) }
     }
 
     /** Stores the selected overview tab so the dashboard can preserve the active section. */
@@ -84,7 +108,7 @@ class PitchSenseViewModel(
     /** Switches the active heat-map metric and fetches the corresponding zone grid. */
     fun onHeatMetricSelected(metric: String) {
         _uiState.update { it.copy(selectedHeatMetric = metric) }
-        loadHeatMap()
+        if (hasLoadedHeatMap) loadHeatMap()
     }
 
     /** Updates the editable pitch-count length before the user applies a new sequence scenario. */
@@ -128,10 +152,22 @@ class PitchSenseViewModel(
     }
 
     /**
+     * Sets how many times the pitcher has faced this batting order (1, 2, or 3).
+     * Passing null clears the selection so the model uses its default bucket.
+     */
+    fun onTimesThroughChanged(value: Int?) {
+        _uiState.update { it.copy(timesThrough = value) }
+    }
+
+    /**
      * Commits the current editable pitch-sequence inputs as the applied scenario
      * and triggers a fresh sequence load for those inputs.
      */
     fun onGenerateUpdatedSequence() {
+        if (_uiState.value.selectedPitcherId.isBlank()) {
+            _uiState.update { it.copy(appliedScenario = "", recommendedSequence = emptyList(), isPitchSequenceLoading = false) }
+            return
+        }
         _uiState.update {
             it.copy(
                 generatedPitchesToPredict = it.pitchesToPredict,
@@ -141,7 +177,8 @@ class PitchSenseViewModel(
                 generatedInning = it.inning,
                 generatedRunnerOnFirst = it.runnerOnFirst,
                 generatedRunnerOnSecond = it.runnerOnSecond,
-                generatedRunnerOnThird = it.runnerOnThird
+                generatedRunnerOnThird = it.runnerOnThird,
+                generatedTimesThrough = it.timesThrough
             )
         }
         loadPitchSequence()
@@ -149,6 +186,7 @@ class PitchSenseViewModel(
 
     /** Loads overview cards for the current batter and optional pitcher matchup. */
     private fun loadOverview() {
+        hasLoadedOverview = true
         val batterId = _uiState.value.selectedBatterId
         val pitcherId = _uiState.value.selectedPitcherId
         viewModelScope.launch {
@@ -164,6 +202,7 @@ class PitchSenseViewModel(
                     it.copy(overviewGeneral = general, overviewPitcherSpecific = pitcherSpecific, overviewError = false, isOffline = false)
                 }
             } catch (e: Exception) {
+                Log.w(TAG, "Overview fetch failed, using fallback data", e)
                 _uiState.update { it.copy(isOffline = true) }
             }
         }
@@ -171,6 +210,7 @@ class PitchSenseViewModel(
 
     /** Loads all advanced-stat sections together so the advanced screen stays in sync. */
     private fun loadAdvanced() {
+        hasLoadedAdvanced = true
         val batterId = _uiState.value.selectedBatterId
         viewModelScope.launch {
             // Show demo data immediately so the screen renders without waiting for the network.
@@ -200,6 +240,7 @@ class PitchSenseViewModel(
                     )
                 }
             } catch (e: Exception) {
+                Log.w(TAG, "Advanced stats fetch failed, using fallback data", e)
                 _uiState.update { it.copy(isOffline = true) }
             }
         }
@@ -207,6 +248,7 @@ class PitchSenseViewModel(
 
     /** Loads the current metric's 5x5 heat-map grid for the selected batter. */
     private fun loadHeatMap() {
+        hasLoadedHeatMap = true
         val batterId = _uiState.value.selectedBatterId
         val metric = _uiState.value.selectedHeatMetric
         viewModelScope.launch {
@@ -217,6 +259,7 @@ class PitchSenseViewModel(
                 val grid = repository.heatMap(metric, batterId)
                 _uiState.update { it.copy(heatMap = grid, heatMapError = false, isOffline = false) }
             } catch (e: Exception) {
+                Log.w(TAG, "Heat map fetch failed, using fallback data", e)
                 _uiState.update { it.copy(isOffline = true) }
             }
         }
@@ -230,21 +273,10 @@ class PitchSenseViewModel(
         val strikes = (state.generatedStrikes.toIntOrNull() ?: 0).coerceIn(0, 2)
         val outs = (state.generatedOuts.toIntOrNull() ?: 0).coerceIn(0, 2)
         viewModelScope.launch {
-            // Show demo data immediately so the screen renders without waiting for the network.
-            val (fakeScenario, fakeSequence) = fallback.recommendedSequence(
-                batterId = state.selectedBatterId,
-                pitcherId = state.selectedPitcherId,
-                pitchesToPredict = pitchesToPredict,
-                balls = balls,
-                strikes = strikes,
-                outs = outs,
-                inning = state.generatedInning,
-                runnerOnFirst = state.generatedRunnerOnFirst,
-                runnerOnSecond = state.generatedRunnerOnSecond,
-                runnerOnThird = state.generatedRunnerOnThird
-            )
-            _uiState.update { it.copy(appliedScenario = fakeScenario, recommendedSequence = fakeSequence) }
-            // Replace with live data if the API responds; mark offline only on failure.
+            // Clear the previous sequence and show a loading indicator while the new
+            // recommendation loads. Unlike other screens, fake data here would be visible
+            // and misleading since the sequence is the primary output the user is waiting for.
+            _uiState.update { it.copy(appliedScenario = "", recommendedSequence = emptyList(), isPitchSequenceLoading = true) }
             try {
                 val (scenario, sequence) = repository.recommendedSequence(
                     batterId = state.selectedBatterId,
@@ -256,11 +288,13 @@ class PitchSenseViewModel(
                     inning = state.generatedInning,
                     runnerOnFirst = state.generatedRunnerOnFirst,
                     runnerOnSecond = state.generatedRunnerOnSecond,
-                    runnerOnThird = state.generatedRunnerOnThird
+                    runnerOnThird = state.generatedRunnerOnThird,
+                    timesThrough = state.generatedTimesThrough
                 )
-                _uiState.update { it.copy(appliedScenario = scenario, recommendedSequence = sequence, isOffline = false) }
+                _uiState.update { it.copy(appliedScenario = scenario, recommendedSequence = sequence, isOffline = false, isPitchSequenceLoading = false) }
             } catch (e: Exception) {
-                _uiState.update { it.copy(isOffline = true) }
+                Log.w(TAG, "Pitch sequence fetch failed, using fallback data", e)
+                _uiState.update { it.copy(isOffline = true, isPitchSequenceLoading = false) }
             }
         }
     }
